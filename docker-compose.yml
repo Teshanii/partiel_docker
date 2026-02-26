@@ -1,0 +1,74 @@
+services:
+
+  database:
+    image: mariadb:10.5
+    container_name: db_maria
+    env_file: .env
+    environment:
+      MARIADB_DATABASE: bibliotheque_db
+      MARIADB_USER: admin_biblio
+      MARIADB_PASSWORD_FILE: /run/secrets/db_password
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+    secrets:
+      - db_password
+      - db_root_password
+    volumes:
+      - data_db:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - net_biblio
+
+  back:
+    build: ./back
+    container_name: back_php
+    ports:
+      - "${PORT_BACK}:80"
+    env_file: .env
+    secrets:
+      - db_password
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - net_biblio
+
+  front:
+    build: ./front
+    container_name: front_html
+    ports:
+      - "${PORT_FRONT}:80"
+    depends_on:
+      - back
+    networks:
+      - net_biblio
+  
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - "${PORT_PHPMYADMIN}:80"
+    environment:
+      PMA_HOST: database
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - net_biblio
+
+networks:
+  net_biblio:
+    driver: bridge
+
+volumes:
+  data_db:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.secret
+  db_root_password:
+    file: ./secrets/db_root_password.secret

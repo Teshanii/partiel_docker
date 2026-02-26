@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <style>
+    body { font-family: sans-serif; margin: 40px; background: #f4f4f4; }
+    table { width: 100%; border-collapse: collapse; background: white; }
+    th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+    th { background: #333; color: white; }
+  </style>
+</head>
+<body>
+  <h1>Liste des Livres</h1>
+  <table id="table-livres">
+    <thead>
+      <tr>
+        <th>Titre</th>
+        <th>Auteur</th>
+        <th>Disponibilite</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="3">Chargement...</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    fetch('http://localhost:3000/index.php')
+      .then(response => response.json())
+      .then(data => {
+        const tbody = document.querySelector('#table-livres tbody');
+        tbody.innerHTML = '';
+        data.forEach(livre => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${livre.titre}</td>
+              <td>${livre.auteur}</td>
+              <td>${livre.disponible == 1 ? 'Oui' : 'Non'}</td>
+            </tr>`;
+        });
+      })
+      .catch(err => console.error("Erreur API:", err));
+  </script>
+</body>
+</html>
