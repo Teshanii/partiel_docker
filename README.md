@@ -78,3 +78,46 @@ IMAGES DOCKER HUB
 Les images sont disponibles sur Docker Hub :
 https://hub.docker.com/r/teshani23/partiel_docker-back
 https://hub.docker.com/r/teshani23/partiel_docker-front
+
+Construction et démarrage
+docker compose up -d --build
+
+docker compose up : démarre tous les services du docker-compose.yml
+-d : en arrière-plan (detached mode), le terminal reste libre
+--build : force la reconstruction des images Docker avant de démarrer
+
+
+Arrêter l'application
+docker compose down
+-> Arrête et supprime tous les conteneurs
+-> Les volumes (données de la DB) sont conservés
+
+docker compose down -v
+-> Même chose mais supprime aussi les volumes (les données de la DB sont perdues)
+
+
+Vérifier que tout tourne
+docker ps
+
+Liste tous les conteneurs actifs
+Permet de vérifier que db_maria, back_php et front_html sont bien Up
+
+
+Voir les logs
+docker compose logs
+->Affiche les logs de tous les services
+
+docker compose logs back
+->Affiche les logs uniquement du service back
+
+
+Pousser les images sur Docker Hub
+docker build -t teshani23/biblio-back:latest ./back
+docker push teshani23e/biblio-back:latest
+
+docker build -t teshani23/biblio-front:latest ./front
+docker push teshani23/biblio-front:latest
+
+->docker build : construit l'image
+-> -t : donne un nom/tag à l'image
+-> docker push : envoie l'image sur Docker Hub
